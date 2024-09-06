@@ -1,0 +1,37 @@
+# Django-specific
+*.pyc
+__pycache__/
+.DS_Store
+.vscode/
+.pytest_cache/
+
+# Elasticsearch-specific
+elasticsearch-data/
+.es-snapshots/
+
+# Docker-specific
+docker-compose.yml
+docker-compose.override.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+.dockerenv
+.dockerignore
+.gitmodules
+
+# React (Vite)-specific
+node_modules/
+package-lock.json
+yarn.lock
+dist/
+.vite/
+.pnp.js
+
+# PostgreSQL-specific
+db.sqlite3
+.pgpass
+
+# General
+.env
+.env.development
+.env.production
+.env.local
