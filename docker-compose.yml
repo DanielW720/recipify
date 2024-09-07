@@ -1,0 +1,43 @@
+services:
+  # React frontend service
+
+  # Django backend service
+  web-api:
+    container_name: web-api
+    build: ./backend/recipify/
+    env_file:
+      - ./.env.web-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - recipify_network
+
+  # Postgres database service
+  postgres:
+    container_name: postgres
+    image: postgres:16
+    env_file:
+      - ./.env.postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./recipify_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+    networks:
+      - recipify_network
+
+  # Elasticsearch service
+
+  # Kibana service
+
+networks:
+  recipify_network:
+    driver: bridge
