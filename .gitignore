@@ -22,4 +22,5 @@ recipify_data/
 # General
 .env*
 data/
+data.csv
 media/
