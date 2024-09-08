@@ -1,12 +1,17 @@
+# docker-compose for running the entire application stack locally
+
 services:
   # React frontend service
 
   # Django backend service
   web-api:
     container_name: web-api
-    build: ./backend/recipify/
+    build: ./backend/
+    command: "python manage.py runserver 0.0.0.0:8000"
     env_file:
       - ./.env.web-api
+    volumes:
+      - ./backend/recipify:/app
     ports:
       - "8000:8000"
     depends_on:
