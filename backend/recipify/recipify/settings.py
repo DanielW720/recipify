@@ -41,8 +41,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "recipify_core",
+    "recipify.apps.RecipifyAdminConfig",
     "rest_framework",
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",

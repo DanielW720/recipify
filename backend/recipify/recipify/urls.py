@@ -1,8 +1,8 @@
-from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls.static import static
 
 from recipify import settings
+from recipify.admin import admin
 
 urlpatterns = [
     path("admin/", admin.site.urls),
