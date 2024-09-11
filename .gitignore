@@ -16,8 +16,10 @@ dist/
 # PostgreSQL
 .pgpass
 
-# Docker Compose volume
+# Docker Compose volumes
 recipify_data/
+es_data/
+kibana_data/
 
 # General
 .env*
