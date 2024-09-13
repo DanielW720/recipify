@@ -2,6 +2,18 @@
 
 Recipify lets you search and upload food and drink recipes.
 
+- [Recipify code repository](#recipify-code-repository)
+  - [Running locally](#running-locally)
+    - [The dataset](#the-dataset)
+    - [The environment variables](#the-environment-variables)
+    - [Running all applications with Docker Compose](#running-all-applications-with-docker-compose)
+      - [React frontend, Django backend, PostgreSQL and Elasticsearch](#react-frontend-django-backend-postgresql-and-elasticsearch)
+      - [Kibana](#kibana)
+      - [Test search API in the shell](#test-search-api-in-the-shell)
+  - [Development](#development)
+    - [Rebuilding images](#rebuilding-images)
+    - [Links](#links)
+
 ## Running locally
 
 ### The dataset
@@ -10,7 +22,7 @@ Food Ingredients and Recipes Dataset with Images: [kaggle.com](https://www.kaggl
 
 Download the zip and extract to `/backend/recipify/`. The directory is mounted to the `/app` directory of the web-app container service, which is useful when populating the database. It also enables auto-rebuilds when there are changes to the source code.
 
-### Environment variables
+### The environment variables
 
 The following .env files are expected:
 
@@ -81,8 +93,43 @@ curl -u elastic:$ELASTIC_PASSWORD \
 docker compose up -d kibana
 ```
 
-## Building images
+#### Test search API in the shell
+
+Start a shell in the container:
+
+`docker exec -it web-api python manage.py shell`
+
+Test the search API:
+
+```
+>>> from recipify_search.documents import RecipeDocument
+>>>
+>>> s = RecipeDocument.search().query("match", title="potatoes")
+>>>
+>>> for hit in s:
+...     print(f"Title: {hit.title}")
+...
+Title: Dill Potatoes
+Title: Campfire Potatoes
+Title: Mashed Potatoes
+Title: Potatoes Rösti
+Title: Scalloped Potatoes
+Title: Roasted Sweet Potatoes, Potatoes, and Sage
+Title: Salt-Roasted Potatoes
+Title: Duchess Baked Potatoes
+Title: Creamy Chive Potatoes
+Title: Luxe French Potatoes
+```
+
+## Development
+
+### Rebuilding images
 
 Django web API image must be rebuilt sometimes, e.g. when adding new libraries to the python environments. Stop and delete the web-api container, then:
 
 `docker compose build web-api && docker compose up -d web-api`
+
+### Links
+
+- Django Elasticsearch DSL docs: [readthedocs.io](https://django-elasticsearch-dsl.readthedocs.io/)
+- Elasticsearch DSL docs: [readthedocs.io](https://elasticsearch-dsl.readthedocs.io/en/latest/)

@@ -5,6 +5,8 @@ from recipify import settings
 
 
 class Recipe(models.Model):
+    """Recipe model."""
+
     title = models.TextField(max_length=200)
     ingredients = ArrayField(models.TextField(max_length=400))
     instructions = models.TextField()
@@ -22,3 +24,7 @@ class Recipe(models.Model):
             if os.path.exists(image_path):
                 os.remove(image_path)  # Delete the image file
         super().delete(*args, **kwargs)
+
+    def ingredients_to_list(self):
+        """Converts the ingredients array to a list of strings."""
+        return self.ingredients
