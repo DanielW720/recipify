@@ -40,14 +40,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "recipify_core",
-    "recipify.apps.RecipifyAdminConfig",
-    "rest_framework",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "django_elasticsearch_dsl",
+    "recipify_core",
+    "recipify.apps.RecipifyAdminConfig",
+    "recipify_search",
 ]
 
 MIDDLEWARE = [
@@ -137,3 +139,13 @@ REST_FRAMEWORK = {
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+ELASTICSEARCH_DSL = {
+    "default": {
+        "hosts": env.get_value("ELASTICSEARCH_URL"),
+        "http_auth": (
+            env.get_value("ELASTIC_USERNAME"),
+            env.get_value("ELASTIC_PASSWORD"),
+        ),
+    }
+}

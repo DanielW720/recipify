@@ -19,7 +19,7 @@ The following .env files are expected:
   - Must include: POSTGRES_USER, POSTGRES_DB, POSTGRES_PASSWORD
 - .env.web-api
   - Used by Docker Compose
-  - Must include: DOCKER_ENV=True, DATABASE_URL
+  - Must include: DATABASE_URL, ELASTIC_USERNAME, ELASTIC_PASSWORD, ELASTICSEARCH_URL
 - .env.es
   - Used by Docker Compose
   - Must include: ELASTIC_USERNAME=elastic, ELASTIC_PASSWORD
@@ -34,7 +34,7 @@ _Only required when running the Django web API outside Docker:_
 
 - backend/.env
   - Only used by Django when the Django project does _not_ run in a Docker container
-  - Must include: DATABASE_URL
+  - Must include: DATABASE_URL, ELASTIC_USERNAME, ELASTIC_PASSWORD, ELASTICSEARCH_URL
 
 ### Running all applications with Docker Compose
 
@@ -43,7 +43,7 @@ _Only required when running the Django web API outside Docker:_
 Setting the POSTGRES_USER and POSTGRES_DB variables when running `docker compose up` will remove related warnings and enable postgres healthchecks right away:
 
 ```
-// run all apps except Kibana
+// Run all apps except Kibana
 docker compose --env-file .env.postgres up -d \
     web-api postgres elasticsearch
 ```
@@ -53,6 +53,10 @@ Populate the database by running the following command:
 `docker exec -it web-api python manage.py import_from_csv ./data`
 
 The `./data` argument is the relative path within the `/app` directory inside the web-api container.
+
+Create and populate the Elasticsearch index:
+
+`docker exec -it web-api python manage.py search_index --rebuild`
 
 #### Kibana
 
@@ -76,3 +80,9 @@ curl -u elastic:$ELASTIC_PASSWORD \
 // Start the Kibana container
 docker compose up -d kibana
 ```
+
+## Building images
+
+Django web API image must be rebuilt sometimes, e.g. when adding new libraries to the python environments. Stop and delete the web-api container, then:
+
+`docker compose build web-api && docker compose up -d web-api`
