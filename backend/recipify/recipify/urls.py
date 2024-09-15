@@ -8,6 +8,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("recipify_core.urls")),
     path("api-auth/", include("rest_framework.urls")),
+    path("search/", include("recipify_search.urls")),
 ]
 
 

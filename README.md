@@ -132,4 +132,6 @@ Django web API image must be rebuilt sometimes, e.g. when adding new libraries t
 ### Links
 
 - Django Elasticsearch DSL docs: [readthedocs.io](https://django-elasticsearch-dsl.readthedocs.io/)
+  - For indexing Django models in Elasticsearch
 - Elasticsearch DSL docs: [readthedocs.io](https://elasticsearch-dsl.readthedocs.io/en/latest/)
+  - Used by Django Elasticsearch DSL and as a high-level Elasticsearch client library which helps with writing and running queries against Elasticsearch
