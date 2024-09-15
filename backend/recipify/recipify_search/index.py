@@ -1,4 +1,4 @@
-from elasticsearch_dsl import Index, Keyword, Mapping, Text, tokenizer
+from elasticsearch_dsl import Index, Keyword, Mapping, Text, tokenizer, Completion
 
 index_name = "recipes"
 
@@ -24,6 +24,7 @@ recipes_mapping.field(
     fields={
         "raw": Keyword(),
         "trigram": Text(analyzer="trigram_analyzer"),
+        "completion": Completion(),
     },
 )
 recipes_mapping.field("image", "text", fields={"raw": Keyword()})

@@ -20,9 +20,13 @@ class RecipeSearchView(APIView):
 
         # Extract query parameter and apply it to the search object
         query = request.query_params.get("query", None)
-        search = search.query(
-            "match",
-            title__trigram=query,
+        search = (
+            search.query(
+                "match",
+                title__trigram=query,
+            )
+            if query
+            else search.query("match_all")
         )
 
         # Apply pagination to the search object
@@ -31,14 +35,26 @@ class RecipeSearchView(APIView):
         except PaginationError as e:
             return Response({"error": str(e)}, status=e.status_code)
 
+        search = search.params(track_total_hits=True)
+
         # Execute the search query
-        result = search.execute().to_dict()
+        result = search.execute()
+
+        if not result.success():
+            return Response(
+                {"error": "An error occurred while processing your request."},
+                status=500,
+            )
+        else:
+            result = result.to_dict()
 
         # Prepare the response data
         total = result["hits"]["total"]["value"]
         response = {
             "total": total,
-            "hits": result["hits"]["hits"],
+            "hits": [
+                {"id": hit["_id"], **hit["_source"]} for hit in result["hits"]["hits"]
+            ],
             "pagination": self.build_pagination_dictionary(request, total),
         }
 
@@ -109,3 +125,51 @@ class RecipeSearchView(APIView):
             )
 
         return search[offset : offset + hits]
+
+
+class RecipeAutoCompleteView(APIView):
+    """Recipe auto-complete API view."""
+
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request: Request, format=None):
+        """Handle GET requests."""
+
+        # Create an Elasticsearch search object
+        search = Search(index=index_name)
+
+        # Extract query parameter and apply it to the search object
+        query = request.query_params.get("query", None)
+
+        if not query:
+            return Response({})
+
+        search = search.suggest(
+            name="title_suggestions",
+            text=query,
+            completion={
+                "field": "title.completion",
+                "fuzzy": {"fuzziness": "AUTO"},
+            },
+        ).source(["title"])
+
+        # Execute the search query
+        result = search.execute()
+
+        if not result.success():
+            return Response(
+                {"error": "An error occurred while processing your request."},
+                status=500,
+            )
+        else:
+            result = result.to_dict()
+
+        # Prepare the response data
+        response = {
+            "suggestions": [
+                {"id": hit["_id"], "text": hit["text"]}
+                for hit in result["suggest"]["title_suggestions"][0]["options"]
+            ]
+        }
+
+        return Response(response)
