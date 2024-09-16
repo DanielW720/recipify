@@ -10,6 +10,7 @@ from recipify_search.index import index_name
 class RecipeSearchView(APIView):
     """Recipe search API view."""
 
+    suggestions_name = "phrase_suggestions"
     permission_classes = [permissions.AllowAny]
 
     def get(self, request: Request, format=None):
@@ -35,7 +36,11 @@ class RecipeSearchView(APIView):
         except PaginationError as e:
             return Response({"error": str(e)}, status=e.status_code)
 
+        # Include total hits in the search result
         search = search.params(track_total_hits=True)
+
+        # Include phrase suggestions in the search result
+        search = self.get_suggestions(request, search)
 
         # Execute the search query
         result = search.execute()
@@ -48,23 +53,24 @@ class RecipeSearchView(APIView):
         else:
             result = result.to_dict()
 
-        # Prepare the response data
-        total = result["hits"]["total"]["value"]
-        response = {
-            "total": total,
-            "hits": [
-                {"id": hit["_id"], **hit["_source"]} for hit in result["hits"]["hits"]
-            ],
-            "pagination": self.build_pagination_dictionary(request, total),
-        }
-
-        return Response(response)
+        return Response(self.build_response(result, request))
 
     def build_pagination_dictionary(self, request: Request, total: int) -> dict:
-        """Build pagination dictionary."""
+        """Build pagination dictionary to be included in the response."""
 
         page = int(request.query_params.get("page", 1))
         hits = int(request.query_params.get("hits", 10))
+
+        if hits == 0:
+            return {
+                "current": None,
+                "first": None,
+                "last": None,
+                "next": None,
+                "previous": None,
+                "pages": [],
+            }
+
         max_num_pages = total // hits if total % hits == 0 else total // hits + 1
 
         def build_url(page: int) -> str:
@@ -96,7 +102,10 @@ class RecipeSearchView(APIView):
         }
 
     def get_pagination(self, request, search) -> Search:
-        """Traditional pagination which lets users jump to a specific result page."""
+        """
+        Traditional pagination which lets users jump to a specific result page. \n
+        This method adds pagination to the search object.
+        """
 
         hits = int(request.query_params.get("hits", 10))
         page = int(request.query_params.get("page", 1))
@@ -114,9 +123,9 @@ class RecipeSearchView(APIView):
                 message=f"Pagination limit exceeded. You tried to access {hits} hits per page, but the maximum is 100."
             )
 
-        if hits < 1:
+        if hits < 0:
             raise PaginationError(
-                message=f"You tried to access {hits} hits per page, but the minimum is 1."
+                message=f"You tried to access {hits} hits per page, but the minimum is 0."
             )
 
         if page < 1:
@@ -125,6 +134,48 @@ class RecipeSearchView(APIView):
             )
 
         return search[offset : offset + hits]
+
+    def get_suggestions(self, request, search) -> Search:
+        """
+        This method adds phrase suggestions to the search object.
+        """
+
+        query = request.query_params.get("query", None)
+
+        return search.suggest(
+            name=self.suggestions_name,
+            text=query,
+            phrase={
+                "field": "title",
+                "size": 3,
+                "highlight": {
+                    "pre_tag": "<em>",
+                    "post_tag": "</em>",
+                },
+            },
+        )
+
+    def build_suggestions(self, result) -> list:
+        """Build suggestions list to be included in the response."""
+
+        return [
+            {"text": hit["text"], "highlighted": hit["highlighted"]}
+            for hit in result["suggest"][self.suggestions_name][0]["options"]
+        ]
+
+    def build_response(self, result: dict[str, any], request: Request) -> dict:
+        """Build response dictionary to be returned by the API."""
+
+        total = result["hits"]["total"]["value"]
+
+        return {
+            "total": total,
+            "hits": [
+                {"id": hit["_id"], **hit["_source"]} for hit in result["hits"]["hits"]
+            ],
+            "pagination": self.build_pagination_dictionary(request, total),
+            "suggestions": self.build_suggestions(result),
+        }
 
 
 class RecipeAutoCompleteView(APIView):
