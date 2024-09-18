@@ -2,6 +2,20 @@
 
 services:
   # React frontend service
+  web-app:
+    container_name: web-app
+    build:
+      context: ./frontend/recipify
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./frontend/recipify:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - web-api
+    networks:
+      - recipify_network
 
   # Django backend service
   web-api:

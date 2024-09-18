@@ -1,3 +1,0 @@
-# Ignore Dockerfile and .env file
-backend/recipify/Dockerfile
-backend/recipify/.env
