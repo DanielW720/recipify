@@ -1,17 +1,20 @@
 # Recipify code repository
 
-Recipify lets you search and upload food and drink recipes.
+Recipify lets you search and upload food and drink recipes. 🍗
 
 - [Recipify code repository](#recipify-code-repository)
   - [Running locally](#running-locally)
     - [The dataset](#the-dataset)
-    - [The environment variables](#the-environment-variables)
+    - [Environment variables](#environment-variables)
     - [Running all applications with Docker Compose](#running-all-applications-with-docker-compose)
-      - [React frontend, Django backend, PostgreSQL and Elasticsearch](#react-frontend-django-backend-postgresql-and-elasticsearch)
-      - [Kibana](#kibana)
-      - [Test search API in the shell](#test-search-api-in-the-shell)
+      - [React, Django, PostgreSQL and Elasticsearch](#react-django-postgresql-and-elasticsearch)
+      - [Django setup](#django-setup)
+      - [Populate the PostgreSQL database and Elasticsearch index](#populate-the-postgresql-database-and-elasticsearch-index)
+      - [Kibana (not required)](#kibana-not-required)
   - [Development](#development)
     - [Rebuilding images](#rebuilding-images)
+    - [Vite setup](#vite-setup)
+    - [Test search API in the shell](#test-search-api-in-the-shell)
     - [Links](#links)
 
 ## Running locally
@@ -20,9 +23,9 @@ Recipify lets you search and upload food and drink recipes.
 
 Food Ingredients and Recipes Dataset with Images: [kaggle.com](https://www.kaggle.com/datasets/pes12017000148/food-ingredients-and-recipe-dataset-with-images/data)
 
-Download the zip and extract to `/backend/recipify/`. The directory is mounted to the `/app` directory of the web-app container service, which is useful when populating the database. It also enables auto-rebuilds when there are changes to the source code.
+Download the zip and extract to `/backend/recipify/data`, and name the csv file `data.csv`. The directory is mounted to the `/app` directory of the web-app container service, which is useful when populating the database. It also enables auto-rebuilds when there are changes to the source code.
 
-### The environment variables
+### Environment variables
 
 The following .env files are expected:
 
@@ -35,6 +38,10 @@ The following .env files are expected:
 - .env.es
   - Used by Docker Compose
   - Must include: ELASTIC_USERNAME=elastic, ELASTIC_PASSWORD
+- backend/.env
+  - Only used by Django when the Django project does _not_ run in a Docker container
+  - Needed for initial migration
+  - Must include: DATABASE_URL, ELASTIC_USERNAME, ELASTIC_PASSWORD, ELASTICSEARCH_URL
 
 _Only required when using Kibana:_
 
@@ -42,37 +49,43 @@ _Only required when using Kibana:_
   - Used by Docker Compose
   - Must include: ELASTICSEARCH_USERNAME=kibana_system, ELASTICSEARCH_PASSWORD
 
-_Only required when running the Django web API outside Docker:_
-
-- backend/.env
-  - Only used by Django when the Django project does _not_ run in a Docker container
-  - Must include: DATABASE_URL, ELASTIC_USERNAME, ELASTIC_PASSWORD, ELASTICSEARCH_URL
-
 ### Running all applications with Docker Compose
 
-#### React frontend, Django backend, PostgreSQL and Elasticsearch
+#### React, Django, PostgreSQL and Elasticsearch
+
+If using WSL2, grant permission for Elasticsearch to use the es_data volume: `sudo chown -R 1000:1000 ./es_data`
 
 Setting the POSTGRES_USER and POSTGRES_DB variables when running `docker compose up` will remove related warnings and enable postgres healthchecks right away:
 
 ```
 // Run all apps except Kibana
 docker compose --env-file .env.postgres up -d \
-    web-api postgres elasticsearch
+    web-app web-api postgres elasticsearch
 ```
 
-Populate the database by running the following command:
+#### Django setup
 
-`docker exec -it web-api python manage.py import_from_csv ./data`
+1. Create a virtual environment: `python -m venv .venv_recipify`
+2. Activate: `source ./.venv_recipify/bin/activate`
+3. `cd` into backend/recipify and install dependencies: `pip install -r requirements.txt`
+4. Perform initial migration: `python manage.py migrate`
+5. Create a superuser: `python manage.py createsuperuser`
 
-The `./data` argument is the relative path within the `/app` directory inside the web-api container.
+#### Populate the PostgreSQL database and Elasticsearch index
 
-Create and populate the Elasticsearch index:
+Create the ES index first so that it gets set up correctly before adding data:
 
 `docker exec -it web-api python manage.py search_index --rebuild`
 
-#### Kibana
+Now populate the database by running the following command:
 
-To start Kibana, some initial steps needs to be made.
+`docker exec -it web-api python manage.py import_from_csv ./data`
+
+The `./data` argument is the relative path within the `/app` directory inside the web-api container, so it does not matter what directory your in when running the command. The Elasticsearch index will be synced automatically.
+
+#### Kibana (not required)
+
+To start Kibana, some initial steps needs to be made. If using WSL2, grant permission to its volume: `sudo chown -R 1000:1000 ./kibana_data`
 
 ```
 // Set the following environment variables in the shell
@@ -93,7 +106,29 @@ curl -u elastic:$ELASTIC_PASSWORD \
 docker compose up -d kibana
 ```
 
-#### Test search API in the shell
+## Development
+
+### Rebuilding images
+
+Django web API image must be rebuilt sometimes, e.g. when adding new libraries to the python environments. Stop and delete the web-api container, then:
+
+`docker compose build web-api && docker compose up -d web-api`
+
+### Vite setup
+
+The Vite app can be run with Docker compose without first installing packages locally. However the editor will not be happy about it when src files are opened.
+
+```
+cd frontend/recipify/
+rm -rf node_modules
+npm install
+```
+
+If using WSL2, file system watching does not work when a file is edited by Windows apps. It is recommended to use WSL2 applications to edit files. When using VS Code, this can be done with the WSL extension.
+
+It is also possible to set `usePolling: true` in [vite.config.ts](/frontend/recipify/vite.config.ts) but it may lead to high CPU utilization.
+
+### Test search API in the shell
 
 Start a shell in the container:
 
@@ -120,14 +155,6 @@ Title: Duchess Baked Potatoes
 Title: Creamy Chive Potatoes
 Title: Luxe French Potatoes
 ```
-
-## Development
-
-### Rebuilding images
-
-Django web API image must be rebuilt sometimes, e.g. when adding new libraries to the python environments. Stop and delete the web-api container, then:
-
-`docker compose build web-api && docker compose up -d web-api`
 
 ### Links
 
