@@ -21,6 +21,9 @@ export default {
         "stroke-animation-10s": "strokeColor 10s linear infinite",
         "stroke-animation-15s": "strokeColor 15s linear infinite",
       },
+      boxShadow: {
+        "black-lg": "0px 10px 25px 5px rgba(0,0,0,0.4)",
+      },
     },
   },
   plugins: [],

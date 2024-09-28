@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
-import { Lines } from "./components/lines/lines";
+import { Lines } from "./components/lines";
+import Searchbar from "./components/searchbar";
+import Title from "./components/title";
 
 export default function App() {
   return (
@@ -10,25 +11,9 @@ export default function App() {
         </div>
         <Title />
       </header>
+      <main className="flex flex-col items-center px-4 pb-10 pt-4">
+        <Searchbar />
+      </main>
     </div>
   );
 }
-
-const Title = () => (
-  <motion.h1
-    className="relative z-10 flex h-full items-center justify-center bg-gradient-to-r from-lightBlue via-pink to-lightBlue bg-[length:200%_100%] bg-clip-text text-6xl font-bold tracking-[15px] text-transparent"
-    variants={{
-      bgPosition: {
-        backgroundPosition: ["200% 0%", "-200% 0%"],
-        scale: [1, 0.98, 1],
-        transition: {
-          duration: 5,
-          repeat: Infinity,
-        },
-      },
-    }}
-    animate="bgPosition"
-  >
-    Recipify
-  </motion.h1>
-);
