@@ -40,7 +40,8 @@ class RecipeSearchView(APIView):
         search = search.params(track_total_hits=True)
 
         # Include phrase suggestions in the search result
-        search = self.get_suggestions(request, search)
+        if query:
+            search = self.get_suggestions(query, search)
 
         # Execute the search query
         result = search.execute()
@@ -86,7 +87,8 @@ class RecipeSearchView(APIView):
 
         # Edge cases
         if page <= 3:
-            end_page = min(max_num_pages, 5)  # Show first 5 pages for early pages
+            # Show first 5 pages for early pages
+            end_page = min(max_num_pages, 5)
         if page > max_num_pages - 3:
             start_page = max(1, max_num_pages - 4)  # Adjust for last few pages
 
@@ -101,7 +103,7 @@ class RecipeSearchView(APIView):
             "pages": pages,
         }
 
-    def get_pagination(self, request, search) -> Search:
+    def get_pagination(self, request: Request, search) -> Search:
         """
         Traditional pagination which lets users jump to a specific result page. \n
         This method adds pagination to the search object.
@@ -133,14 +135,12 @@ class RecipeSearchView(APIView):
                 message=f"You tried to access page {page}, but the minimum is 1."
             )
 
-        return search[offset : offset + hits]
+        return search[offset: offset + hits]
 
-    def get_suggestions(self, request, search) -> Search:
+    def get_suggestions(self, query: str, search) -> Search:
         """
         This method adds phrase suggestions to the search object.
         """
-
-        query = request.query_params.get("query", None)
 
         return search.suggest(
             name=self.suggestions_name,
@@ -157,6 +157,9 @@ class RecipeSearchView(APIView):
 
     def build_suggestions(self, result) -> list:
         """Build suggestions list to be included in the response."""
+
+        if "suggest" not in result or self.suggestions_name not in result["suggest"]:
+            return []
 
         return [
             {"text": hit["text"], "highlighted": hit["highlighted"]}
