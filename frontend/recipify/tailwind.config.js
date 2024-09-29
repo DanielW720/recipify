@@ -10,6 +10,9 @@ export default {
         pink: "#DE11EF",
         gray: "#374154",
       },
+      fontFamily: {
+        playwrite: "Playwrite DE Grund",
+      },
       keyframes: {
         strokeColor: {
           "0%": { stroke: 'theme("colors.blue")' },

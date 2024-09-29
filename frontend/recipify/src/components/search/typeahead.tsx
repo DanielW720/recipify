@@ -8,7 +8,7 @@ export default function Typeahead({
   activeIndex: number;
 }) {
   const variants = {
-    hidden: { opacity: 0, scale: 0.9 },
+    hidden: { opacity: 0, scale: 0.5 },
     visible: { opacity: 1, scale: 1 },
     drop: { transition: { staggerChildren: 0.1 } },
   };
@@ -27,14 +27,14 @@ export default function Typeahead({
           animate={["visible", "drop"]}
           exit="hidden"
           transition={{ duration: 0.1 }}
-          className="bg-gray/70 shadow-black-lg relative z-10 overflow-hidden rounded-md text-sm"
+          className="bg-gray/70 shadow-black-lg relative z-10 overflow-hidden rounded-md text-xs"
         >
           {completions.map((completion, i) => (
             <motion.li
               key={completion}
               initial={{ opacity: 0, y: -20 }}
               variants={childVariants}
-              className={`${i % 2 ? "" : ""} px-4 py-1 ${activeIndex === i ? "bg-black/30 text-blue" : ""} transition-colors duration-100`}
+              className={`${i % 2 ? "" : ""} px-4 py-2 ${activeIndex === i ? "bg-black/30 text-blue" : ""} transition-colors duration-100`}
             >
               {completion}
             </motion.li>

@@ -4,7 +4,7 @@ import Title from "./components/title";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0d152e] to-[#152659]">
+    <div className="font-playwrite min-h-screen bg-gradient-to-b from-[#0d152e] to-[#152659]">
       <header className="relative flex h-32 w-full items-center justify-center">
         <div className="absolute inset-0 overflow-hidden">
           <Lines />
