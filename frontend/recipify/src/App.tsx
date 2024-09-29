@@ -1,5 +1,5 @@
 import { Lines } from "./components/lines";
-import Searchbar from "./components/searchbar";
+import Search from "./components/search/search";
 import Title from "./components/title";
 
 export default function App() {
@@ -12,7 +12,7 @@ export default function App() {
         <Title />
       </header>
       <main className="flex flex-col items-center px-4 pb-10 pt-4">
-        <Searchbar />
+        <Search />
       </main>
     </div>
   );

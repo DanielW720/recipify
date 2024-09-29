@@ -8,6 +8,7 @@ export default {
         lightBlue: "#00FFFF",
         aqua: "#05C2EB",
         pink: "#DE11EF",
+        gray: "#374154",
       },
       keyframes: {
         strokeColor: {
