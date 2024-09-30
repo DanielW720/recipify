@@ -35,6 +35,8 @@ The following .env files are expected:
 - .env.web-api
   - Used by Docker Compose
   - Must include: DATABASE_URL, ELASTIC_USERNAME, ELASTIC_PASSWORD, ELASTICSEARCH_URL
+- frontend/recipify/.env.local
+  - Must include: VITE_SEARCH_API_URL=http://localhost:8000/search/
 - .env.es
   - Used by Docker Compose
   - Must include: ELASTIC_USERNAME=elastic, ELASTIC_PASSWORD

@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
+import { Completion } from "../../hooks/useCompletion";
 
 export default function Typeahead({
   completions,
   activeIndex,
 }: {
-  completions: string[];
+  completions: Completion[];
   activeIndex: number;
 }) {
   const variants = {
@@ -27,16 +28,16 @@ export default function Typeahead({
           animate={["visible", "drop"]}
           exit="hidden"
           transition={{ duration: 0.1 }}
-          className="bg-gray/70 shadow-black-lg relative z-10 overflow-hidden rounded-md text-xs"
+          className="bg-gray/70 shadow-black-lg absolute z-10 mt-2 overflow-hidden rounded-md text-xs"
         >
           {completions.map((completion, i) => (
             <motion.li
-              key={completion}
+              key={completion.id}
               initial={{ opacity: 0, y: -20 }}
               variants={childVariants}
               className={`${i % 2 ? "" : ""} px-4 py-2 ${activeIndex === i ? "bg-black/30 text-blue" : ""} transition-colors duration-100`}
             >
-              {completion}
+              {completion.text}
             </motion.li>
           ))}
         </motion.ul>

@@ -34,7 +34,10 @@ SECRET_KEY = "django-insecure-&zgy0(t*prkl*!8!=@&a6rl^60hqrr!r29*%-c4j9f743-6qy%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'web-api',
+    'localhost',
+]
 
 
 # Application definition
@@ -50,11 +53,13 @@ INSTALLED_APPS = [
     "recipify_core",
     "recipify.apps.RecipifyAdminConfig",
     "recipify_search",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -149,3 +154,8 @@ ELASTICSEARCH_DSL = {
         ),
     }
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]

@@ -6,7 +6,7 @@ import Typeahead from "./typeahead";
 export default function Searchbar() {
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(-1);
-  const completions = useCompletion(query);
+  const [completions, reset] = useCompletion(query);
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,7 +14,7 @@ export default function Searchbar() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const length = completions.length;
+    const length = completions.completions.length;
 
     if (length > 0) {
       if (e.key === "ArrowDown") {
@@ -24,8 +24,9 @@ export default function Searchbar() {
         e.preventDefault();
         setActiveIndex((prev) => (prev <= -1 ? length - 1 : prev - 1));
       } else if (e.key === "Enter" && activeIndex >= 0) {
-        setQuery(completions[activeIndex]);
+        setQuery(completions.completions[activeIndex].text);
         setActiveIndex(-1);
+        reset();
       } else if (e.key === "Escape") {
         setActiveIndex(-1);
       }
@@ -36,7 +37,7 @@ export default function Searchbar() {
     <form
       onSubmit={submit}
       method="get"
-      className="w-64 tracking-wide text-aqua"
+      className="relative w-64 tracking-wide text-aqua"
     >
       <div className="shadow-black-lg bg-gray flex items-center gap-2 rounded-md px-4 py-2 font-semibold">
         <label htmlFor="search" className="hidden">
@@ -59,7 +60,10 @@ export default function Searchbar() {
           <IoSearch className="text-xl" />
         </button>
       </div>
-      <Typeahead completions={completions} activeIndex={activeIndex} />
+      <Typeahead
+        completions={completions.completions}
+        activeIndex={activeIndex}
+      />
     </form>
   );
 }
