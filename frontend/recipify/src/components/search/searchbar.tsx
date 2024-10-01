@@ -9,7 +9,7 @@ export default function Searchbar() {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [query, setQuery] = useContext(QueryContext);
   const [completions, reset] = useContext(CompletionContext);
-  const [results, search] = useContext(SearchContext);
+  const [_, search] = useContext(SearchContext);
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

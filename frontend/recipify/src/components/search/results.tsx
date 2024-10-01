@@ -1,8 +1,10 @@
 import { useContext } from "react";
 import { SearchContext } from "../../contexts/useSearchContext";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function Results() {
-  const [results, search] = useContext(SearchContext);
+  const [results, _] = useContext(SearchContext);
 
   if (!results) {
     return null;
@@ -19,7 +21,7 @@ export default function Results() {
           >
             <h2 className="text-center">{hit.title}</h2>
             <img
-              src={`${"http://localhost:8000"}${hit.image}`}
+              src={`${API_URL}${hit.image}`}
               alt={`${hit.title} picture`}
               className="h-36 rounded-md object-cover shadow-md"
               sizes="200px"
