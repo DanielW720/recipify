@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { IoSearch } from "react-icons/io5";
-import useCompletion from "../../hooks/useCompletion";
+import { QueryContext } from "./search";
+import { CompletionContext } from "../../contexts/useCompletionContext";
 import Typeahead from "./typeahead";
+import { SearchContext } from "../../contexts/useSearchContext";
 
 export default function Searchbar() {
-  const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [completions, reset] = useCompletion(query);
+  const [query, setQuery] = useContext(QueryContext);
+  const [completions, reset] = useContext(CompletionContext);
+  const [results, search] = useContext(SearchContext);
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -27,8 +30,12 @@ export default function Searchbar() {
         setQuery(completions.completions[activeIndex].text);
         setActiveIndex(-1);
         reset();
+      } else if (e.key === "Enter") {
+        search();
+        reset();
       } else if (e.key === "Escape") {
         setActiveIndex(-1);
+        reset();
       }
     }
   };
@@ -37,9 +44,9 @@ export default function Searchbar() {
     <form
       onSubmit={submit}
       method="get"
-      className="relative w-64 tracking-wide text-aqua"
+      className="relative w-full max-w-xs tracking-wide text-aqua"
     >
-      <div className="shadow-black-lg bg-gray flex items-center gap-2 rounded-md px-4 py-2 font-semibold">
+      <div className="flex items-center gap-2 rounded-md bg-gray px-2 py-2 text-sm font-semibold shadow-black-lg">
         <label htmlFor="search" className="hidden">
           Search recipes
         </label>
@@ -54,7 +61,7 @@ export default function Searchbar() {
           }}
           onKeyDown={handleKeyDown}
           placeholder="Search recipes"
-          className="w-full bg-inherit outline-none"
+          className="w-full bg-inherit tracking-wide outline-none"
         />
         <button type="submit">
           <IoSearch className="text-xl" />
@@ -62,6 +69,7 @@ export default function Searchbar() {
       </div>
       <Typeahead
         completions={completions.completions}
+        setQuery={setQuery}
         activeIndex={activeIndex}
       />
     </form>
