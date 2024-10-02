@@ -1,26 +1,26 @@
 import { createContext, ReactNode, useContext } from "react";
-import useCompletion, { Completion } from "../hooks/useCompletion";
+import useCompletion, { UseCompletionType } from "../hooks/useCompletion";
 
-export const CompletionContext = createContext<
-  [
-    {
-      completions: Completion[];
-    },
-    () => void,
-  ]
->([{ completions: [] }, () => {}]);
+const CompletionContext = createContext<UseCompletionType | null>(null);
 
 export const CompletionProvider = ({
   query,
+  setQuery,
   children,
 }: {
   query: string;
+  setQuery: React.Dispatch<React.SetStateAction<string>>;
   children: ReactNode;
 }) => {
-  const [completions, reset] = useCompletion(query);
+  const { completions, reset, browseCompletions, activeIndex } = useCompletion(
+    query,
+    setQuery,
+  );
 
   return (
-    <CompletionContext.Provider value={[completions, reset]}>
+    <CompletionContext.Provider
+      value={{ completions, reset, browseCompletions, activeIndex }}
+    >
       {children}
     </CompletionContext.Provider>
   );

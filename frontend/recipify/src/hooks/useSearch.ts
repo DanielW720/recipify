@@ -31,15 +31,21 @@ export type SearchResult = {
 
 const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL as string;
 
-export default function useSearch(
-  query: string,
-): [SearchResult | undefined, () => Promise<void>] {
+export type UseSearchType = {
+  results: SearchResult | undefined;
+  search: () => Promise<void>;
+};
+
+export default function useSearch(query: string): UseSearchType {
   const [results, setResults] = useState<SearchResult>();
 
+  /**
+   * Debounce the search query to prevent too many requests
+   */
   useEffect(() => {
     const timer = setTimeout(() => {
       search();
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [query]);
@@ -53,5 +59,5 @@ export default function useSearch(
     setResults(data);
   };
 
-  return [results, search];
+  return { results, search };
 }

@@ -1,10 +1,9 @@
-import { useContext } from "react";
-import { SearchContext } from "../../contexts/useSearchContext";
+import { useSearchContext } from "../../contexts/useSearchContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Results() {
-  const [results, _] = useContext(SearchContext);
+  const { results } = useSearchContext();
 
   if (!results) {
     return null;

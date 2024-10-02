@@ -10,6 +10,9 @@ services:
     volumes:
       - ./frontend/recipify:/app
       # - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000/
+      - VITE_SEARCH_API_URL=http://localhost:8000/search/
     ports:
       - "3000:3000"
     depends_on:

@@ -1,9 +1,7 @@
 import { createContext, ReactNode, useContext } from "react";
-import useSearch, { SearchResult } from "../hooks/useSearch";
+import useSearch, { UseSearchType } from "../hooks/useSearch";
 
-export const SearchContext = createContext<
-  [SearchResult | undefined, () => Promise<void>]
->([undefined, async () => {}]);
+const SearchContext = createContext<UseSearchType | null>(null);
 
 export const SearchProvider = ({
   query,
@@ -12,10 +10,10 @@ export const SearchProvider = ({
   query: string;
   children: ReactNode;
 }) => {
-  const [results, search] = useSearch(query);
+  const { results, search } = useSearch(query);
 
   return (
-    <SearchContext.Provider value={[results, search]}>
+    <SearchContext.Provider value={{ results, search }}>
       {children}
     </SearchContext.Provider>
   );

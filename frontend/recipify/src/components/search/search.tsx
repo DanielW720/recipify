@@ -3,10 +3,17 @@ import Searchbar from "./searchbar";
 import { SearchProvider } from "../../contexts/useSearchContext";
 import { CompletionProvider } from "../../contexts/useCompletionContext";
 import Results from "./results";
+import Typeahead from "./typeahead";
 
-export const QueryContext = createContext<
-  [string, React.Dispatch<React.SetStateAction<string>>]
->(["", () => {}]);
+export type QueryContextType = {
+  query: string;
+  setQuery: React.Dispatch<React.SetStateAction<string>>;
+};
+
+export const QueryContext = createContext<QueryContextType>({
+  query: "",
+  setQuery: () => {},
+});
 
 /**
  * Parent component for the searchbar, results, typeahead, filters etc.
@@ -15,13 +22,14 @@ export default function Search() {
   const [query, setQuery] = useState("");
 
   return (
-    <QueryContext.Provider value={[query, setQuery]}>
-      <CompletionProvider query={query}>
-        <SearchProvider query={query}>
+    <QueryContext.Provider value={{ query, setQuery }}>
+      <SearchProvider query={query}>
+        <CompletionProvider query={query} setQuery={setQuery}>
           <Searchbar />
+          <Typeahead />
           <Results />
-        </SearchProvider>
-      </CompletionProvider>
+        </CompletionProvider>
+      </SearchProvider>
     </QueryContext.Provider>
   );
 }

@@ -1,24 +1,21 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Completion } from "../../hooks/useCompletion";
+import { useContext } from "react";
+import { useCompletionContext } from "../../contexts/useCompletionContext";
+import { QueryContext } from "./search";
 
-export default function Typeahead({
-  completions,
-  setQuery,
-  activeIndex,
-}: {
-  completions: Completion[];
-  setQuery: (q: string) => void;
-  activeIndex: number;
-}) {
-  const variants = {
-    hidden: { opacity: 0, scale: 0.5 },
-    visible: { opacity: 1, scale: 1 },
-    drop: { transition: { staggerChildren: 0.1 } },
-  };
+const variants = {
+  hidden: { opacity: 0, scale: 0.5 },
+  visible: { opacity: 1, scale: 1 },
+  drop: { transition: { staggerChildren: 0.1 } },
+};
 
-  const childVariants = {
-    drop: { opacity: 1, y: 0 },
-  };
+const childVariants = {
+  drop: { opacity: 1, y: 0 },
+};
+
+export default function Typeahead() {
+  const { setQuery } = useContext(QueryContext);
+  const { completions, reset, activeIndex } = useCompletionContext();
 
   return (
     <AnimatePresence>
@@ -30,7 +27,7 @@ export default function Typeahead({
           animate={["visible", "drop"]}
           exit="hidden"
           transition={{ duration: 0.1 }}
-          className="from-gray to-gray/95 shadow-black-lg absolute z-10 mt-2 w-full overflow-hidden rounded-md bg-gradient-to-b text-xs"
+          className="absolute z-10 mt-12 w-full max-w-xs overflow-hidden rounded-md bg-gradient-to-b from-gray to-gray/95 text-xs text-aqua shadow-black-lg"
         >
           {completions.map((completion, i) => (
             <motion.li
@@ -40,7 +37,10 @@ export default function Typeahead({
             >
               <button
                 type="button"
-                onClick={() => setQuery(completion.text)}
+                onClick={() => {
+                  setQuery(completion.text);
+                  reset();
+                }}
                 className={`p-2 ${activeIndex === i ? "bg-black/30 text-blue" : ""} w-full text-left tracking-wide transition-colors duration-100 hover:bg-black/30 hover:text-blue`}
               >
                 {completion.text}
