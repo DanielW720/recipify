@@ -34,20 +34,28 @@ const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL as string;
 export type UseSearchType = {
   results: SearchResult | undefined;
   search: () => Promise<void>;
+  loading: boolean;
 };
 
 export default function useSearch(query: string): UseSearchType {
   const [results, setResults] = useState<SearchResult>();
+  const [loading, setLoading] = useState(false);
 
   /**
    * Debounce the search query to prevent too many requests
    */
   useEffect(() => {
-    const timer = setTimeout(() => {
-      search();
+    setLoading(true);
+
+    const timer = setTimeout(async () => {
+      await search();
+      setLoading(false);
     }, 500);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      setLoading(false);
+    };
   }, [query]);
 
   const search = async () => {
@@ -59,5 +67,5 @@ export default function useSearch(query: string): UseSearchType {
     setResults(data);
   };
 
-  return { results, search };
+  return { results, search, loading };
 }

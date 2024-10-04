@@ -3,9 +3,10 @@ import { IoSearch } from "react-icons/io5";
 import { QueryContext } from "./search";
 import { useCompletionContext } from "../../contexts/useCompletionContext";
 import { useSearchContext } from "../../contexts/useSearchContext";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 export default function Searchbar() {
-  const { search } = useSearchContext();
+  const { search, loading } = useSearchContext();
   const { query, setQuery } = useContext(QueryContext);
   const { reset, browseCompletions } = useCompletionContext();
 
@@ -35,8 +36,12 @@ export default function Searchbar() {
           placeholder="Search recipes"
           className="w-full bg-inherit tracking-wide outline-none"
         />
-        <button type="submit">
-          <IoSearch className="text-xl" />
+        <button type="submit" className="text-xl">
+          {loading ? (
+            <AiOutlineLoading3Quarters className="animate-spin" />
+          ) : (
+            <IoSearch />
+          )}
         </button>
       </div>
     </form>
