@@ -27,7 +27,7 @@ export default function Typeahead() {
           animate={["visible", "drop"]}
           exit="hidden"
           transition={{ duration: 0.1 }}
-          className="absolute z-10 mt-12 w-full max-w-xs overflow-hidden rounded-md bg-gradient-to-b from-gray to-gray/95 text-xs text-aqua shadow-black-lg"
+          className="absolute z-10 mt-12 w-full max-w-xs overflow-hidden rounded-md bg-gradient-to-b from-gray to-gray/95 text-xs text-aqua shadow-black-lg md:max-w-sm xl:mt-14 xl:max-w-md xl:text-sm"
         >
           {completions.map((completion, i) => (
             <motion.li

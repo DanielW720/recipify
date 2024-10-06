@@ -11,9 +11,11 @@ export default function Results() {
   }
 
   return (
-    <div className="mt-4 text-sm font-semibold text-gray">
-      <p className="">{results.total.toLocaleString()} results</p>
-      <ul className="mt-14 grid grid-cols-1 justify-items-center gap-14">
+    <div className="mt-4 text-sm font-semibold text-gray md:mt-8 xl:mt-10">
+      <p className="text-xs text-white">
+        {results.total.toLocaleString()} results
+      </p>
+      <ul className="mt-14 grid grid-cols-1 justify-items-center gap-14 md:grid-cols-2 xl:grid-cols-5">
         {results.hits.map((hit) => (
           <Hit key={hit.id} hit={hit} />
         ))}
@@ -25,7 +27,7 @@ export default function Results() {
 const Hit = ({ hit }: { hit: HitType }) => (
   <li
     key={hit.id}
-    className="bg-darkBlue flex w-[300px] flex-col gap-2 rounded-md border-[1px] border-aqua p-2 shadow-black-lg"
+    className="flex w-[300px] flex-col justify-between gap-2 rounded-md border-[1px] border-aqua bg-darkBlue p-2 shadow-black-lg xl:w-[200px]"
   >
     <h2 className="text-center font-semibold tracking-wider text-aqua">
       {hit.title}
@@ -33,7 +35,7 @@ const Hit = ({ hit }: { hit: HitType }) => (
     <img
       src={`${API_URL}${hit.image}`}
       alt={`${hit.title} picture`}
-      className="h-44 rounded-md object-cover shadow-md"
+      className="h-44 rounded-md object-cover shadow-md xl:h-28"
       sizes="500px"
     />
   </li>

@@ -30,6 +30,9 @@ export default {
       boxShadow: {
         "black-lg": "0px 10px 25px 5px rgba(0,0,0,0.4)",
       },
+      screens: {
+        xs: "475px",
+      },
     },
   },
   plugins: [],

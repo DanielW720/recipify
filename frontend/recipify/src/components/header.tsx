@@ -5,7 +5,7 @@ const duration = 10;
 
 export default function Header() {
   return (
-    <header className="relative flex h-[8rem] w-full items-center justify-center">
+    <header className="relative flex h-[8rem] w-full items-center justify-center xl:h-[9rem]">
       <Lines />
       <Title />
     </header>
@@ -15,7 +15,7 @@ export default function Header() {
 function Title() {
   return (
     <motion.h1
-      className="relative z-10 flex h-full cursor-pointer items-center justify-center bg-gradient-to-r from-lightBlue via-pink to-lightBlue bg-[length:200%_100%] bg-clip-text text-5xl font-bold tracking-[15px] text-transparent"
+      className="xs:text-6xl relative z-10 flex h-full cursor-pointer items-center justify-center bg-gradient-to-r from-lightBlue via-pink to-lightBlue bg-[length:200%_100%] bg-clip-text text-5xl font-bold tracking-[15px] text-transparent xl:text-7xl"
       onClick={() => window.location.reload()}
       variants={{
         bgPosition: {
@@ -35,7 +35,7 @@ function Title() {
 }
 
 const Lines = (props: SVGProps<SVGSVGElement>) => (
-  <div className="absolute inset-0 overflow-hidden">
+  <div className="absolute inset-0 -z-10 h-screen overflow-hidden md:-top-10">
     <motion.div
       className="animate-stroke-animation-10s blur-[2px]"
       animate={{

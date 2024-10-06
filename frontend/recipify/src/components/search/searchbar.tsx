@@ -20,9 +20,9 @@ export default function Searchbar() {
     <form
       onSubmit={submit}
       method="get"
-      className="relative w-full max-w-xs tracking-wide text-aqua"
+      className="relative w-full max-w-xs tracking-wide text-aqua md:max-w-sm xl:max-w-md"
     >
-      <div className="flex items-center gap-2 rounded-md bg-gray px-2 py-2 text-sm font-semibold shadow-black-lg">
+      <div className="flex items-center gap-2 rounded-md bg-gray px-2 py-2 text-sm font-semibold shadow-black-lg xl:text-lg">
         <label htmlFor="search" className="hidden">
           Search recipes
         </label>
@@ -36,7 +36,7 @@ export default function Searchbar() {
           placeholder="Search recipes"
           className="w-full bg-inherit tracking-wide outline-none"
         />
-        <button type="submit" className="text-xl">
+        <button type="submit" className="text-xl xl:text-2xl">
           {loading ? (
             <AiOutlineLoading3Quarters className="animate-spin" />
           ) : (
