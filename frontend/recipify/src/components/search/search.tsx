@@ -4,6 +4,7 @@ import { SearchProvider } from "../../contexts/useSearchContext";
 import { CompletionProvider } from "../../contexts/useCompletionContext";
 import Results from "./results";
 import Typeahead from "./typeahead";
+import Suggestions from "./suggestions";
 
 export type QueryContextType = {
   query: string;
@@ -26,6 +27,7 @@ export default function Search() {
       <SearchProvider query={query}>
         <CompletionProvider query={query} setQuery={setQuery}>
           <Searchbar />
+          <Suggestions />
           <Typeahead />
           <Results />
         </CompletionProvider>
