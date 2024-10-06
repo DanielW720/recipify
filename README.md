@@ -3,6 +3,7 @@
 Recipify lets you search and upload food and drink recipes. 🍗
 
 - [Recipify code repository](#recipify-code-repository)
+  - [About this project](#about-this-project)
   - [Running locally](#running-locally)
     - [The dataset](#the-dataset)
     - [Environment variables](#environment-variables)
@@ -16,6 +17,15 @@ Recipify lets you search and upload food and drink recipes. 🍗
     - [Vite setup](#vite-setup)
     - [Test search API in the shell](#test-search-api-in-the-shell)
     - [Links](#links)
+
+## About this project
+
+The project includes the following services:
+
+- A Django REST API to interact with the database and search engine
+- A Vite/React frontend application
+- PostgreSQL database
+- Elasticsearch and Kibana for search
 
 ## Running locally
 

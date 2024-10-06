@@ -1,6 +1,7 @@
 import os
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.utils import timezone
 from recipify import settings
 
 
@@ -13,6 +14,7 @@ class Recipe(models.Model):
     image_name = models.TextField(max_length=200)
     image = models.ImageField(upload_to="images/", null=True)
     cleaned_ingredients = ArrayField(models.TextField(max_length=400))
+    published = models.DateField(default=timezone.now)
 
     def __str__(self):
         return f"{self.id}: {self.title}"

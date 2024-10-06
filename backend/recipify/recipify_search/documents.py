@@ -19,4 +19,5 @@ class RecipeDocument(Document):
             "title",
             "instructions",
             "image",
+            "published",
         ]

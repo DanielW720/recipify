@@ -30,4 +30,5 @@ recipes_mapping.field(
 recipes_mapping.field("image", "text", fields={"raw": Keyword()})
 recipes_mapping.field("ingredients", "text")
 recipes_mapping.field("instructions", "text")
+recipes_mapping.field("published", "date")
 recipes.mapping(recipes_mapping)

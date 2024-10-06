@@ -4,6 +4,8 @@ import ast
 from django.core.files import File
 from django.core.management.base import BaseCommand
 from recipify_core.models import Recipe
+import random
+from datetime import timedelta, datetime
 
 
 class Command(BaseCommand):
@@ -16,6 +18,11 @@ class Command(BaseCommand):
         path = kwargs["path"]
         self.import_recipes(path)
 
+    def random_date(self):
+        """Function to generate a random date within the past year."""
+        start_date = datetime.now() - timedelta(days=365)
+        return start_date + timedelta(days=random.randint(0, 365))
+
     def import_recipes(self, path):
         csv_path = f"{path}/data.csv"
         with open(csv_path, "r", encoding="utf-8") as file:
@@ -23,7 +30,8 @@ class Command(BaseCommand):
             for row in reader:
                 # Use ast.literal_eval to convert string representation of lists into actual lists
                 ingredients = ast.literal_eval(row["Ingredients"])
-                cleaned_ingredients = ast.literal_eval(row["Cleaned_Ingredients"])
+                cleaned_ingredients = ast.literal_eval(
+                    row["Cleaned_Ingredients"])
 
                 # Look for the image file in the Food Images/Food Images/ directory
                 image_path = f"{path}/Food Images/Food Images/{row['Image_Name']}.jpg"
@@ -39,7 +47,9 @@ class Command(BaseCommand):
                     image_name=f'{row["Image_Name"]}.jpg',
                     image=image_file,
                     cleaned_ingredients=cleaned_ingredients,
+                    published=self.random_date(),
                 )
+
                 try:
                     recipe.save()
                     print(f"Saved {recipe}")
