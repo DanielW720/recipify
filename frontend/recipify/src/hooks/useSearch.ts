@@ -6,6 +6,7 @@ export type Hit = {
   title: string;
   instructions: string;
   image: string;
+  published: string;
 };
 
 export type Pagination = {

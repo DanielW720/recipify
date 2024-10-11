@@ -1,3 +1,4 @@
+from datetime import datetime
 from elasticsearch_dsl import Search
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -42,6 +43,8 @@ class RecipeSearchView(APIView):
         # Include phrase suggestions in the search result
         if query:
             search = self.get_suggestions(query, search)
+
+        search = self.build_published_range_filter(search, request)
 
         # Execute the search query
         result = search.execute()
@@ -165,6 +168,28 @@ class RecipeSearchView(APIView):
             {"text": hit["text"], "highlighted": hit["highlighted"]}
             for hit in result["suggest"][self.suggestions_name][0]["options"]
         ]
+
+    def build_published_range_filter(self, search, request: Request) -> Search:
+        """Build published date range filter for the search object."""
+
+        start_date = request.query_params.get("start_date", None)
+        end_date = request.query_params.get("end_date", None)
+
+        # Validate date format
+        def is_valid_date(date_str):
+            try:
+                datetime.strptime(date_str, "%Y-%m-%d")
+                return True
+            except (ValueError, TypeError):
+                return False
+
+        if start_date and is_valid_date(start_date):
+            search = search.filter("range", published={"gte": start_date})
+
+        if end_date and is_valid_date(end_date):
+            search = search.filter("range", published={"lte": end_date})
+
+        return search
 
     def build_response(self, result: dict[str, any], request: Request) -> dict:
         """Build response dictionary to be returned by the API."""
