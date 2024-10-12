@@ -7,7 +7,7 @@ const ranges = [
 
 export default function RangeFilters() {
   return (
-    <div className="mt-4 text-xs tracking-wider text-white">
+    <div className="tracking-wider text-white">
       <h3 className="font-semibold">Published range</h3>
       {ranges.map((o) => (
         <RangeFilter key={o.param} param={o.param} label={o.label} />
@@ -20,7 +20,7 @@ const RangeFilter = ({ param, label }: { param: string; label: string }) => {
   const { filters, setFilterParameter, removeFilter } = useSearchContext();
 
   return (
-    <div className="mt-2 flex">
+    <div className="mt-2 flex text-blue">
       <label htmlFor={param}>{label}:</label>
       <input
         type="date"
@@ -34,7 +34,7 @@ const RangeFilter = ({ param, label }: { param: string; label: string }) => {
         value={filters.find((f) => f.key === param)?.value || ""}
         id={param}
         name={param}
-        className="flex w-full bg-darkBlue px-2 text-white/90 outline-none"
+        className="flex w-full bg-darkBlue px-2 outline-none"
       />
     </div>
   );
