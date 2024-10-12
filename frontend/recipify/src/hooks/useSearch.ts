@@ -30,17 +30,28 @@ export type SearchResult = {
   suggestions: Suggestion[];
 };
 
+export type Filter = {
+  key: string;
+  value: string[];
+};
+
 const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL as string;
 
 export type UseSearchType = {
   results: SearchResult | undefined;
   search: () => Promise<void>;
   loading: boolean;
+  filters: Filter[];
+  addFilter: (key: string, value: string) => void;
+  removeFilter: (key: string, value?: string) => void;
+  setFilterParameter: (key: string, value: string) => void;
 };
 
 export default function useSearch(query: string): UseSearchType {
   const [results, setResults] = useState<SearchResult>();
   const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState<Filter[]>([]);
+  const [filterParams, setFilterParams] = useState<string>("");
 
   /**
    * Debounce the search query to prevent too many requests
@@ -57,10 +68,93 @@ export default function useSearch(query: string): UseSearchType {
       clearTimeout(timer);
       setLoading(false);
     };
-  }, [query]);
+  }, [query, filterParams]);
 
+  /**
+   * Update the filter parameters when filters change
+   */
+  useEffect(() => {
+    if (filters.length === 0) {
+      setFilterParams("");
+      return;
+    }
+
+    const params = filters
+      .map((filter) => `${filter.key}=${filter.value.join(",")}`)
+      .join("&");
+
+    setFilterParams(`&${params}`);
+  }, [filters]);
+
+  /**
+   * Add a filter to the search query
+   */
+  const addFilter = (key: string, value: string) => {
+    setFilters((prev) => {
+      const filter = prev.find((f) => f.key === key);
+
+      if (filter) {
+        filter.value.push(value);
+        return [...prev];
+      }
+
+      return [...prev, { key, value: [value] }];
+    });
+  };
+
+  /**
+   * Set a filter parameter. Using this function will replace the current values of the filter.
+   */
+  const setFilterParameter = (key: string, value: string) => {
+    setFilters((prev) => {
+      const filter = prev.find((f) => f.key === key);
+
+      if (filter) {
+        filter.value = [value];
+        return [...prev];
+      }
+
+      return [...prev, { key, value: [value] }];
+    });
+  };
+
+  /**
+   * Remove a filter from the search query. If no value is provided, the entire filter will be removed.
+   */
+  const removeFilter = (key: string, value?: string) => {
+    setFilters((prev) => {
+      const filter = prev.find((f) => f.key === key);
+
+      if (filter) {
+        if (!value) {
+          // Remove the entire filter if no value is provided
+          return prev.filter((f) => f.key !== key);
+        }
+
+        // Remove the value from the filter
+        filter.value = filter.value.filter((v) => v !== value);
+
+        if (filter.value.length === 0) {
+          return prev.filter((f) => f.key !== key);
+        }
+
+        return [...prev];
+      }
+
+      return prev;
+    });
+  };
+
+  /**
+   * Execute the search query
+   */
   const search = async () => {
-    const response = await fetch(`${SEARCH_API_URL}?query=${query}`, {
+    const q = query ? `query=${encodeURI(query)}` : "";
+    const url = `${SEARCH_API_URL}${query || filterParams ? "?" : ""}${q}${filterParams}`;
+
+    console.log(url);
+
+    const response = await fetch(url, {
       headers: { Accept: "application/json" },
     });
     const data = (await response.json()) as SearchResult;
@@ -68,5 +162,13 @@ export default function useSearch(query: string): UseSearchType {
     setResults(data);
   };
 
-  return { results, search, loading };
+  return {
+    results,
+    search,
+    loading,
+    filters,
+    addFilter,
+    removeFilter,
+    setFilterParameter,
+  };
 }

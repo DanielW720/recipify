@@ -10,10 +10,28 @@ export const SearchProvider = ({
   query: string;
   children: ReactNode;
 }) => {
-  const { results, search, loading } = useSearch(query);
+  const {
+    results,
+    search,
+    loading,
+    filters,
+    addFilter,
+    removeFilter,
+    setFilterParameter,
+  } = useSearch(query);
 
   return (
-    <SearchContext.Provider value={{ results, search, loading }}>
+    <SearchContext.Provider
+      value={{
+        results,
+        search,
+        loading,
+        filters,
+        addFilter,
+        removeFilter,
+        setFilterParameter,
+      }}
+    >
       {children}
     </SearchContext.Provider>
   );
