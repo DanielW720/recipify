@@ -12,10 +12,10 @@ export default function Suggestions() {
   }
 
   return (
-    <div className="mt-2 text-sm text-white">
+    <div className="mt-8 text-sm text-white">
       Did you mean{" "}
       <span
-        className="text-lightBlue underline"
+        className="cursor-pointer text-lightBlue underline"
         onClick={() => setQuery(suggestions[0].text)}
       >
         {suggestions[0].text}

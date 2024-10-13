@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export type Completion = { id: string; text: string };
 
@@ -7,6 +7,7 @@ const endpoint = `${SEARCH_API_URL}complete/`;
 
 export type UseCompletionType = {
   completions: Completion[];
+  load: () => Promise<void>;
   reset: () => void;
   browseCompletions: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   activeIndex: number;
@@ -18,41 +19,19 @@ export default function useCompletion(
 ): UseCompletionType {
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const wasReset = useRef(false);
 
   /**
-   * Fetch completions
+   * Fetch completions when query changes and is not empty.
+   * Debounce the query to prevent too many requests.
    */
   useEffect(() => {
-    const completion = async () => {
-      if (query && !wasReset.current) {
-        const url = `${endpoint}?query=${query}`;
-        const response = await fetch(url, {
-          headers: {
-            Accept: "application/json",
-          },
-        });
-        const data = await response.json();
-
-        setCompletions(
-          data["suggestions"]?.map((s: Completion) => ({
-            id: s["id"],
-            text: s["text"],
-          })),
-        );
-        wasReset.current = false;
-      }
-    };
-
     // Clear completions instantly if query is empty
     if (!query) {
       setCompletions([]);
-      wasReset.current = false;
     }
 
     const timer = setTimeout(() => {
-      completion();
-      wasReset.current = false;
+      load();
     }, 200);
 
     return () => clearTimeout(timer);
@@ -67,8 +46,31 @@ export default function useCompletion(
     }
   }, [query]);
 
+  /**
+   * Fetch completions from the API
+   */
+  const load = async () => {
+    console.log("(load) query:", query);
+
+    if (query) {
+      const url = `${endpoint}?query=${query}`;
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+      const data = await response.json();
+
+      setCompletions(
+        data["suggestions"]?.map((s: Completion) => ({
+          id: s["id"],
+          text: s["text"],
+        })),
+      );
+    }
+  };
+
   const reset = () => {
-    wasReset.current = true;
     setCompletions([]);
   };
 
@@ -96,5 +98,5 @@ export default function useCompletion(
     }
   };
 
-  return { completions, reset, browseCompletions, activeIndex };
+  return { completions, load, reset, browseCompletions, activeIndex };
 }

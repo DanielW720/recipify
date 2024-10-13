@@ -12,14 +12,12 @@ export const CompletionProvider = ({
   setQuery: React.Dispatch<React.SetStateAction<string>>;
   children: ReactNode;
 }) => {
-  const { completions, reset, browseCompletions, activeIndex } = useCompletion(
-    query,
-    setQuery,
-  );
+  const { completions, load, reset, browseCompletions, activeIndex } =
+    useCompletion(query, setQuery);
 
   return (
     <CompletionContext.Provider
-      value={{ completions, reset, browseCompletions, activeIndex }}
+      value={{ completions, load, reset, browseCompletions, activeIndex }}
     >
       {children}
     </CompletionContext.Provider>

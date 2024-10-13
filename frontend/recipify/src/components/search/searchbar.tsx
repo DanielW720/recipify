@@ -8,7 +8,7 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 export default function Searchbar() {
   const { search, loading } = useSearchContext();
   const { query, setQuery } = useContext(QueryContext);
-  const { reset, browseCompletions } = useCompletionContext();
+  const { load, reset, browseCompletions } = useCompletionContext();
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,6 +33,8 @@ export default function Searchbar() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={browseCompletions}
+          onBlur={reset}
+          onClick={load}
           placeholder="Search recipes"
           className="w-full bg-inherit tracking-wide outline-none"
         />

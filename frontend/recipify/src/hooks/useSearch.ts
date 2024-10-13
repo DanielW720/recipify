@@ -152,8 +152,6 @@ export default function useSearch(query: string): UseSearchType {
     const q = query ? `query=${encodeURI(query)}` : "";
     const url = `${SEARCH_API_URL}${query || filterParams ? "?" : ""}${q}${filterParams}`;
 
-    console.log(url);
-
     const response = await fetch(url, {
       headers: { Accept: "application/json" },
     });
