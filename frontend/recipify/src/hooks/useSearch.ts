@@ -35,6 +35,7 @@ export type Filter = {
   value: string[];
 };
 
+const API_URL = import.meta.env.VITE_API_URL as string;
 const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL as string;
 
 export type UseSearchType = {
@@ -46,6 +47,7 @@ export type UseSearchType = {
   removeFilter: (key: string, value?: string) => void;
   setFilterParameter: (key: string, value: string) => void;
   clearFilters: () => void;
+  scroll: () => Promise<void>;
 };
 
 export default function useSearch(query: string): UseSearchType {
@@ -165,6 +167,26 @@ export default function useSearch(query: string): UseSearchType {
     setFilters([]);
   };
 
+  /**
+   * Scroll to the next page of results.
+   * Appends the next page of results to the current results, useful for infinite scrolling.
+   */
+  const scroll = async () => {
+    if (!results?.pagination.next) {
+      return;
+    }
+
+    const url = `${API_URL.replace(/\$/, "")}${results.pagination.next}`;
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+    });
+    const data = (await response.json()) as SearchResult;
+
+    data.hits = [...results.hits, ...data.hits];
+
+    setResults(data);
+  };
+
   return {
     results,
     search,
@@ -174,5 +196,6 @@ export default function useSearch(query: string): UseSearchType {
     removeFilter,
     setFilterParameter,
     clearFilters,
+    scroll,
   };
 }

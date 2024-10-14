@@ -50,8 +50,6 @@ export default function useCompletion(
    * Fetch completions from the API
    */
   const load = async () => {
-    console.log("(load) query:", query);
-
     if (query) {
       const url = `${endpoint}?query=${query}`;
       const response = await fetch(url, {

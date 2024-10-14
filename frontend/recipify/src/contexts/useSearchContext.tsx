@@ -19,6 +19,7 @@ export const SearchProvider = ({
     removeFilter,
     setFilterParameter,
     clearFilters,
+    scroll,
   } = useSearch(query);
 
   return (
@@ -32,6 +33,7 @@ export const SearchProvider = ({
         removeFilter,
         setFilterParameter,
         clearFilters,
+        scroll,
       }}
     >
       {children}
