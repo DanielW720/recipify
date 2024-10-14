@@ -45,6 +45,7 @@ export type UseSearchType = {
   addFilter: (key: string, value: string) => void;
   removeFilter: (key: string, value?: string) => void;
   setFilterParameter: (key: string, value: string) => void;
+  clearFilters: () => void;
 };
 
 export default function useSearch(query: string): UseSearchType {
@@ -160,6 +161,10 @@ export default function useSearch(query: string): UseSearchType {
     setResults(data);
   };
 
+  const clearFilters = () => {
+    setFilters([]);
+  };
+
   return {
     results,
     search,
@@ -168,5 +173,6 @@ export default function useSearch(query: string): UseSearchType {
     addFilter,
     removeFilter,
     setFilterParameter,
+    clearFilters,
   };
 }
