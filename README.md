@@ -44,8 +44,8 @@ The following .env files are expected:
   - Must include: POSTGRES_USER, POSTGRES_DB, POSTGRES_PASSWORD
 - .env.web-api
   - Used by Docker Compose
-  - Must include: DATABASE_URL, ELASTIC_USERNAME, ELASTIC_PASSWORD, ELASTICSEARCH_URL
-- .env.es
+  - Must include: DATABASE_URL (format: postgres://\<username>:\<password>@\<hostname>:\<port>/\<database_name>), ELASTIC_USERNAME, ELASTIC_PASSWORD, ELASTICSEARCH_URL
+- .env.elasticsearch
   - Used by Docker Compose
   - Must include: ELASTIC_USERNAME=elastic, ELASTIC_PASSWORD
 - backend/.env
@@ -75,10 +75,12 @@ docker compose --env-file .env.postgres up -d \
 
 #### Django setup
 
+To run django commands from outside Docker, the Django environment needs to be set up locally. Alternatively, manage.py commands can be run from the web-api container with "docker exec -it web-api python [COMMAND]".
+
 1. Create a virtual environment: `python -m venv .venv_recipify`
-2. Activate: `source ./.venv_recipify/bin/activate`
-3. `cd` into backend/recipify and install dependencies: `pip install -r requirements.txt`
-4. Perform initial migration: `python manage.py migrate`
+2. Activate: `source ./.venv_recipify/bin/activate` (`source ./.venv_recipify/Scripts/activate` on bash for Windows)
+3. `cd` into backend directory and install dependencies: `pip install -r requirements.txt`
+4. `cd` into backend/recipify and perform initial migration: `python manage.py migrate`
 5. Create a superuser: `python manage.py createsuperuser`
 
 #### Populate the PostgreSQL database and Elasticsearch index
@@ -120,9 +122,9 @@ docker compose up -d kibana
 
 ### Rebuilding images
 
-Django web API image must be rebuilt sometimes, e.g. when adding new libraries to the python environments. Stop and delete the web-api container, then:
+Django web API image must be rebuilt sometimes, e.g. when adding new libraries to the python environments. To rebuild and run the web-api service, run:
 
-`docker compose build web-api && docker compose up -d web-api`
+`docker compose up -d web-api --build`
 
 ### Vite setup
 

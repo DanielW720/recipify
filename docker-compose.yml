@@ -9,7 +9,7 @@ services:
       dockerfile: Dockerfile.dev
     volumes:
       - ./frontend/recipify:/app
-      # - /app/node_modules
+      - /app/node_modules # Should be installed in the Linux environment to avoid dependency issues
     environment:
       - VITE_API_URL=http://localhost:8000/
       - VITE_SEARCH_API_URL=http://localhost:8000/search/

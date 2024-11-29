@@ -9,6 +9,9 @@ RUN apk add --no-cache curl
 # Copy package.json
 COPY package.json ./
 
+# Sometimes npm i is run on another platform than linux which can cause dependency issues
+RUN rm -rf node_modules
+
 # Install dependencies
 RUN npm install
 
