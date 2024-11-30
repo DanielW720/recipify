@@ -1,4 +1,5 @@
 import { Hit as HitType } from "../../hooks/useSearch";
+import formatDate from "../../utils/formatDate";
 
 export const Hit = ({ hit, imageUrl }: { hit: HitType; imageUrl: string }) => (
   <li
@@ -8,7 +9,7 @@ export const Hit = ({ hit, imageUrl }: { hit: HitType; imageUrl: string }) => (
     <h2 className="text-center font-semibold tracking-wider text-aqua">
       {hit.title}
     </h2>
-    <p className="mt-1 text-xs text-white/50">{hit.published}</p>
+    <p className="mt-1 text-xs text-white/50">{formatDate(hit.published)}</p>
     <img
       src={imageUrl}
       alt={`${hit.title} picture`}
