@@ -31,4 +31,7 @@ recipes_mapping.field("image", "text", fields={"raw": Keyword()})
 recipes_mapping.field("ingredients", "text")
 recipes_mapping.field("instructions", "text")
 recipes_mapping.field("published", "date")
+recipes_mapping.field("title_embedding", "dense_vector")
+
+# Add the mapping to the index
 recipes.mapping(recipes_mapping)

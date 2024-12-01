@@ -16,6 +16,8 @@ Recipify lets you search and upload food and drink recipes. 🍗
     - [Rebuilding images](#rebuilding-images)
     - [Vite setup](#vite-setup)
     - [Test search API in the shell](#test-search-api-in-the-shell)
+    - [Test title vector embedding](#test-title-vector-embedding)
+    - [Update the requirements.txt file](#update-the-requirementstxt-file)
     - [Links](#links)
 
 ## About this project
@@ -168,9 +170,39 @@ Title: Creamy Chive Potatoes
 Title: Luxe French Potatoes
 ```
 
+### Test title vector embedding
+
+Start a shell in the container:
+
+`docker exec -it web-api python manage.py shell`
+
+```
+>>> from recipify_core.models import Recipe
+>>>
+>>> obj = Recipe.objects.get(pk='666')
+>>> obj.__str__()
+'666: Miso-Butter Roast Chicken With Acorn Squash Panzanella'
+>>>
+>>> obj.title_embedding()
+array([-2.98841652e-02,  3.66088413e-02, -7.71749839e-02,  5.98382279e-02,
+       -1.63089763e-02, -2.77271681e-02,  7.48105571e-02, -3.65380533e-02,
+        .
+        .
+        .
+        6.67738318e-02,  4.46503051e-03,  7.35084862e-02,  1.49704758e-02,
+        6.07997703e-04, -4.69589569e-02,  4.06818325e-03,  5.78198582e-02],
+      dtype=float32)
+```
+
+### Update the requirements.txt file
+
+`pip freeze > requirements.txt`
+
 ### Links
 
 - Django Elasticsearch DSL docs: [readthedocs.io](https://django-elasticsearch-dsl.readthedocs.io/)
   - For indexing Django models in Elasticsearch
 - Elasticsearch DSL docs: [readthedocs.io](https://elasticsearch-dsl.readthedocs.io/en/latest/)
   - Used by Django Elasticsearch DSL and as a high-level Elasticsearch client library which helps with writing and running queries against Elasticsearch
+- Python Elasticsearch Client: [readthedocs.io](https://elasticsearch-py.readthedocs.io/en/v8.16.0/)
+  - Official low-level client for Elasticsearch. Elasticsearch DSL builds on top of this.

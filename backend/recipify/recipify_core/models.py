@@ -2,7 +2,10 @@ import os
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
+from sentence_transformers import SentenceTransformer
 from recipify import settings
+
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
 class Recipe(models.Model):
@@ -30,3 +33,7 @@ class Recipe(models.Model):
     def ingredients_to_list(self):
         """Converts the ingredients array to a list of strings."""
         return self.ingredients
+
+    def title_embedding(self):
+        """Returns a dense vector representation of the recipe title."""
+        return embedding_model.encode(self.title).tolist()

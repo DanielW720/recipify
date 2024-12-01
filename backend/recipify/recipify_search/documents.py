@@ -21,3 +21,9 @@ class RecipeDocument(Document):
             "image",
             "published",
         ]
+
+    def prepare(self, instance):
+        data = super().prepare(instance)
+        # Add the title_embedding field
+        data["title_embedding"] = instance.title_embedding()
+        return data
