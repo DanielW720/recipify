@@ -1,11 +1,26 @@
 from datetime import datetime
+from enum import Enum
+import logging
 from elasticsearch_dsl import Search
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework.request import Request
+from sentence_transformers import SentenceTransformer
 from recipify_search.errors import PaginationError
 from recipify_search.index import index_name
+
+embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+
+
+class SearchModes(Enum):
+    """Search modes for RecipeSearchView."""
+    KEYWORD = "keyword"
+    KNN = "knn"
+    HYBRID = "hybrid"
+
+
+logger = logging.getLogger(__name__)
 
 
 class RecipeSearchView(APIView):
@@ -13,6 +28,26 @@ class RecipeSearchView(APIView):
 
     suggestions_name = "phrase_suggestions"
     permission_classes = [permissions.AllowAny]
+
+    def get_query(self, query: str, search: Search) -> Search:
+        """Adds a traditional fulltext search query to the search object."""
+        return search.query(
+            "match",
+            title__trigram=query,
+        )
+
+    def get_knn_query(self, query: str, search: Search, request: Request) -> Search:
+        """Adds a KNN query to the search object. Retrieves the top 100 results, allowing for pagination, unless the number of hits are set to a number equal or larger than 100."""
+        query_vector = embedding_model.encode(query).tolist()
+        k = int(request.query_params.get("k", 100))
+
+        return search.knn(
+            "title_embedding",
+            k=k,
+            query_vector=query_vector,
+            # Same as the Elasticsearch default
+            num_candidates=min(k * 1.5, 10_000),
+        )
 
     def get(self, request: Request, format=None):
         """Handle GET requests."""
@@ -22,14 +57,25 @@ class RecipeSearchView(APIView):
 
         # Extract query parameter and apply it to the search object
         query = request.query_params.get("query", None)
-        search = (
-            search.query(
-                "match",
-                title__trigram=query,
-            )
-            if query
-            else search.query("match_all")
-        )
+        mode = request.query_params.get("mode", "keyword")
+        if (query is None):
+            search = search.query("match_all")
+        elif (mode == SearchModes.KNN.value):
+            # Smart mode (kNN search)
+            search = self.get_knn_query(query, search, request)
+        elif (mode == SearchModes.HYBRID.value):
+            # Combine kNN search with traditional keyword search (hybrid retrieval)
+            logger.info("Hybrid (hybrid retrieval) is not yet supported.")
+            return Response({
+                "error": "Bad request.",
+                "message": "Hybrid mode is not yet supported."
+            }, status=400)
+        else:
+            # Default to keyword mode (traditional fulltext search)
+            search = self.get_query(query, search)
+
+        # Exclude title_embedding field from the search result
+        search = search.source(excludes=["title_embedding"])
 
         # Apply pagination to the search object
         try:
