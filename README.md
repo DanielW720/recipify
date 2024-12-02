@@ -2,6 +2,10 @@
 
 Recipify lets you search and upload food and drink recipes. 🍗
 
+This project includes an **AI Search feature powered by vector search**, which can be enabled with a simple toggle. This functionality allows users to perform more intuitive and semantic searches. For instance, if you're searching for smoothie recipes, entering "healthy drinks" will surface a variety of relevant options. In contrast, a traditional search might struggle with such queries since most recipes don’t explicitly include terms like "healthy" or "drinks" in their text.
+
+To ensure privacy and self-hostability, this implementation exclusively uses open-source language models from Hugging Face. All data remains entirely private, and the solution can be deployed independently without reliance on external services.
+
 - [Recipify code repository](#recipify-code-repository)
   - [About this project](#about-this-project)
   - [Running locally](#running-locally)
