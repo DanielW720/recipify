@@ -12,8 +12,6 @@ export default function Results() {
     return null;
   }
 
-  console.log(results.hits.length);
-
   return (
     <div className="text-sm font-semibold text-gray">
       <ul className="mt-14 grid grid-cols-1 justify-items-center gap-14 md:grid-cols-2 xl:grid-cols-5">

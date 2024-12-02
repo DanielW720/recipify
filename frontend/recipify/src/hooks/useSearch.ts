@@ -35,6 +35,8 @@ export type Filter = {
   value: string[];
 };
 
+export type Mode = "keyword" | "knn" | undefined;
+
 const API_URL = import.meta.env.VITE_API_URL as string;
 const SEARCH_API_URL = import.meta.env.VITE_SEARCH_API_URL as string;
 
@@ -48,6 +50,8 @@ export type UseSearchType = {
   setFilterParameter: (key: string, value: string) => void;
   clearFilters: () => void;
   scroll: () => Promise<void>;
+  mode: Mode;
+  setMode: React.Dispatch<React.SetStateAction<"keyword" | "knn" | undefined>>;
 };
 
 export default function useSearch(query: string): UseSearchType {
@@ -55,6 +59,7 @@ export default function useSearch(query: string): UseSearchType {
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<Filter[]>([]);
   const [filterParams, setFilterParams] = useState<string>("");
+  const [mode, setMode] = useState<Mode>();
 
   /**
    * Debounce the search query to prevent too many requests
@@ -152,8 +157,15 @@ export default function useSearch(query: string): UseSearchType {
    * Execute the search query
    */
   const search = async () => {
-    const q = query ? `query=${encodeURI(query)}` : "";
-    const url = `${SEARCH_API_URL}${query || filterParams ? "?" : ""}${q}${filterParams}`;
+    const url = new URL(SEARCH_API_URL);
+    if (query) {
+      url.searchParams.append("query", query);
+    }
+    filters.forEach((filter) =>
+      url.searchParams.append(filter.key, filter.value.join(",")),
+    );
+
+    url.searchParams.append("mode", mode || "keyword");
 
     const response = await fetch(url, {
       headers: { Accept: "application/json" },
@@ -197,5 +209,7 @@ export default function useSearch(query: string): UseSearchType {
     setFilterParameter,
     clearFilters,
     scroll,
+    mode,
+    setMode,
   };
 }
